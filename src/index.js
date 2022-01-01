@@ -89,7 +89,7 @@ function clickLoadMore(e) {
           disabledBtn();
           setTimeout(() => {
             reqListener(result.data.hits)
-          }, 1000);
+          }, 250);
             
         })
 }

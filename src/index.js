@@ -26,7 +26,7 @@ function fetchSubmit(e) {
     refs.divCard.innerHTML = '';
     // disabledBtn();
   const searchName = e.target.elements.searchQuery.value
-  renderQwe(searchName);
+  createRender(searchName);
   window.addEventListener('scroll', () => {
     let contentHeight = refs.divCard.offsetHeight; 
 let Offset = window.pageYOffset;
@@ -34,7 +34,7 @@ let window_height = window.innerHeight;
 let y = Offset + window_height;
       if (y >= contentHeight) {
         counter += 1;
-        createRender(searchName, counter);
+        createRenderScroll(searchName, counter);
   }
   })
 }
@@ -42,7 +42,7 @@ let y = Offset + window_height;
 
 
 
-async function renderQwe(searchName) {
+async function createRender(searchName) {
   console.log(counter);
    await axios.get(`${BASE_URL}?key=${KEY}&q=${searchName}&${PARAMS_SEARCH}&page=1`)
      .then(result => {
@@ -58,7 +58,7 @@ async function renderQwe(searchName) {
         });
 }
 
-async function createRender(searchName, counter) {
+async function createRenderScroll(searchName, counter) {
   console.log(counter);
    await axios.get(`${BASE_URL}?key=${KEY}&q=${searchName}&${PARAMS_SEARCH}&page=${counter}`)
      .then(result => {

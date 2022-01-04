@@ -1,56 +1,84 @@
 import axios from 'axios';
 import Notiflix from 'notiflix';
 import './sass/main.scss';
+
 const refs = {
     form: document.querySelector('.search-form'),
     input: document.querySelector('input[name=searchQuery]'),
     button: document.querySelector('button'),
     divCard: document.querySelector('.gallery'),
-    loadMore: document.querySelector('.load-more')
+  // loadMore: document.querySelector('.load-more'),
 }
 
-// let gallerySet = new SimpleLightbox('.gallery a', { captionPosition: "bottom", captionDelay: 250 });
-// gallerySet.refresh();
+
+
+
 const KEY = '25039854-a3db15db04ef67fa10500b312'
 const BASE_URL = 'https://pixabay.com/api/'
 const PARAMS_SEARCH = 'image_type=photo&orientation=horizontal&safesearch=true&per_page=40'
 refs.form.addEventListener('submit', fetchSubmit)
-refs.loadMore.addEventListener('click', clickLoadMore)
+// refs.loadMore.addEventListener('click', clickLoadMore)
 
 
-
+let counter = 1;
 function fetchSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
     refs.divCard.innerHTML = '';
-    disabledBtn();
+    // disabledBtn();
   const searchName = e.target.elements.searchQuery.value
-  // gallerySet.refresh();
-  createRender(searchName);
-    
+  renderQwe(searchName);
+  window.addEventListener('scroll', () => {
+    let contentHeight = refs.divCard.offsetHeight; 
+let Offset = window.pageYOffset;
+let window_height = window.innerHeight;
+let y = Offset + window_height;
+      if (y >= contentHeight) {
+        counter += 1;
+        createRender(searchName, counter);
+  }
+  })
 }
 
-async function createRender(searchName) {
+
+
+
+async function renderQwe(searchName) {
+  console.log(counter);
    await axios.get(`${BASE_URL}?key=${KEY}&q=${searchName}&${PARAMS_SEARCH}&page=1`)
-       .then(result => {
+     .then(result => {
         if (result.data.hits.length < 1) {
         Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.')
         return;
         }
-         enambeBtn();
-            const Obj = result.data.hits;
-            Notiflix.Notify.success(`Hooray! We found ${result.data.totalHits} images.`)
+        //  enambeBtn();
+       const Obj = result.data.hits;
+        Notiflix.Notify.success(`Hooray! We found ${result.data.totalHits} images.`)
          reqListener(Obj);
             
         });
 }
-// `<a class="gallery__item" href='${webformatURL}'></a>
-async function reqListener (Obj) {
-    const addCards = Obj.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => {
+
+async function createRender(searchName, counter) {
+  console.log(counter);
+   await axios.get(`${BASE_URL}?key=${KEY}&q=${searchName}&${PARAMS_SEARCH}&page=${counter}`)
+     .then(result => {
+        if (result.data.hits.length < 1) {
+        Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.')
+        return;
+        }
+        //  enambeBtn();
+            const Obj = result.data.hits;
+         reqListener(Obj);
+            
+        });
+}
+async function reqListener(Obj) {
+  const addCards = Obj.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => {
       return `<div class="photo-card">
-       
-  <img width=500 height=300 src="${webformatURL}" title='${tags}' alt="${tags}" loading="${largeImageURL}"/>
-  
-  <div class="info">
+     <a class="gallery__item" href='${largeImageURL}'>
+    <img class="gallery__image" width=500 height=300 src="${webformatURL}" alt="${tags}" loading="${downloads}"/>
+    </a>
+<div class="info">
     <p class="info-item">
       <b>Likes<br>
       ${likes}</b>
@@ -71,44 +99,39 @@ async function reqListener (Obj) {
 </div>`
      })
     refs.divCard.insertAdjacentHTML('beforeend', addCards.join(''));
-    enambeBtn();
+  // enambeBtn();
+  let gallerySet = new SimpleLightbox('.gallery a');
+    gallerySet.refresh();
 }
 
 
-let counter = 1;
-function clickLoadMore(e) {
-    counter += 1;
-    axios.get(`${BASE_URL}?key=${KEY}&q=${refs.input.value}&${PARAMS_SEARCH}&page=${counter}`)
-        .then(result => {
-            if (result.data.hits.length < 1) {
-                refs.loadMore.classList.add('invisible')
-                Notiflix.Notify.warning('Were sorry, but you have reached the end of search results.')
-                return;
-            }
-          // gallerySet.refresh();
-          disabledBtn();
-          setTimeout(() => {
-            reqListener(result.data.hits)
-          }, 250);
+
+// function clickLoadMore(e) {
+
+//     axios.get(`${BASE_URL}?key=${KEY}&q=${refs.input.value}&${PARAMS_SEARCH}&page=${counter}`)
+//         .then(result => {
+//             if (result.data.hits.length < 1) {
+//                 refs.loadMore.classList.add('invisible')
+//                 Notiflix.Notify.warning('Were sorry, but you have reached the end of search results.')
+//                 return;
+//             }
+//           disabledBtn();
+//           setTimeout(() => {
+//             reqListener(result.data.hits)
+//           }, 250);
             
-        })
-}
+//         })
+// }
 
-function disabledBtn() {
-    refs.loadMore.classList.remove('invisible')
-    refs.loadMore.textContent = 'Загружаем'
-    refs.loadMore.disabled = true;
-}
+// function disabledBtn() {
+//     refs.loadMore.classList.remove('invisible')
+//     refs.loadMore.textContent = 'Загружаем'
+//     refs.loadMore.disabled = true;
+// }
     
-function enambeBtn() {
-    refs.loadMore.textContent = 'Load more'
-    refs.loadMore.disabled = false;
-}
+// function enambeBtn() {
+//     refs.loadMore.textContent = 'Load more'
+//     refs.loadMore.disabled = false;
+// }
 
-
-
-// gallerySet.on( 'show.simplelightbox', function () {
-    
-//   return;
-// } );
 

@@ -20,9 +20,9 @@ refs.form.addEventListener('submit', fetchSubmit)
 // refs.loadMore.addEventListener('click', clickLoadMore)
 let gallerySet = new SimpleLightbox('.gallery a');
 let counter = 1;
-window.addEventListener('scroll', qwe)
+window.addEventListener('scroll', renderScroll)
 
-function qwe(e) {
+function renderScroll(e) {
   e.preventDefault();
     let contentHeight = refs.divCard.offsetHeight;
       let yOffset = window.pageYOffset;

@@ -18,59 +18,61 @@ const BASE_URL = 'https://pixabay.com/api/'
 const PARAMS_SEARCH = 'image_type=photo&orientation=horizontal&safesearch=true&per_page=40'
 refs.form.addEventListener('submit', fetchSubmit)
 // refs.loadMore.addEventListener('click', clickLoadMore)
-
-
-let counter = 1;
 let gallerySet = new SimpleLightbox('.gallery a');
+let counter = 1;
+window.addEventListener('scroll', qwe)
 
-function fetchSubmit(e) {
+function qwe(e) {
   e.preventDefault();
-    // disabledBtn();
-  const searchName = e.target.elements.searchQuery.value
-  
-  window.addEventListener('scroll', () => {
-    let contentHeight = refs.divCard.offsetHeight; 
-let Offset = window.pageYOffset;
-let window_height = window.innerHeight;
-    let y = Offset + window_height;
-    if (y >= contentHeight) {
-      gallerySet.refresh();
-      
-      counter += 1;
-        createRenderScroll(searchName, counter);
-  }
-  })
-  refs.divCard.innerHTML = '';
-  createRender(searchName);
+    let contentHeight = refs.divCard.offsetHeight;
+      let yOffset = window.pageYOffset;
+      let window_height = window.innerHeight;
+      let y = yOffset + window_height;
+      if (y >= contentHeight) {
+        gallerySet.refresh();
+        counter += 1;
+        // console.log('WindowSubmit', counter)
+       createRenderScroll(counter);
+      }
+}
+
+
+async function fetchSubmit(e) {
+  e.preventDefault();
   counter = 1;
+    // disabledBtn();
+  console.log('submit', counter)
+  refs.divCard.innerHTML = '';
+  
+  createRender(counter);
+  // console.log('downSubmit', counter)  
 }
 
 
 
 
-async function createRender(searchName) {
-
-  await axios.get(`${BASE_URL}?key=${KEY}&q=${searchName}&${PARAMS_SEARCH}&page=${counter}`)
+async function createRender(counter) {
+  
+  // console.log('reset', counter)
+  await axios.get(`${BASE_URL}?key=${KEY}&q=${refs.input.value}&${PARAMS_SEARCH}&page=${counter}`)
     .then(result => {
       if (result.data.hits.length < 1) {
-        Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.')
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
         return;
       }
       //  enambeBtn();
       const Obj = result.data.hits;
       Notiflix.Notify.success(`Hooray! We found ${result.data.totalHits} images.`)
       reqListener(Obj);
-            
     });
 }
 
-async function createRenderScroll(searchName, counter) {
-  console.log(counter);
-
-  await axios.get(`${BASE_URL}?key=${KEY}&q=${searchName}&${PARAMS_SEARCH}&page=${counter}`)
+async function createRenderScroll(counter) {
+// console.log('createScroll', counter)
+  await axios.get(`${BASE_URL}?key=${KEY}&q=${refs.input.value}&${PARAMS_SEARCH}&page=${counter}`)
     .then(result => {
       if (result.data.hits.length < 1) {
-        Notiflix.Notify.warning('Sorry, there are no images matching your search query. Please try again.')
+        Notiflix.Notify.warning('Were sorry, but you have reached the end of search results.')
         return;
       }
       //  enambeBtn();
@@ -80,7 +82,7 @@ async function createRenderScroll(searchName, counter) {
     });
 }
  function reqListener(Obj) {
-  
+
   const addCards = Obj.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => {
       return `<div class="photo-card">
      <a class="gallery__item" href='${largeImageURL}'>
@@ -105,21 +107,18 @@ async function createRenderScroll(searchName, counter) {
     </p>
   </div>
 </div>`
-     })
-  refs.divCard.insertAdjacentHTML('beforeend', addCards.join(''));
+  })
+   
+   refs.divCard.insertAdjacentHTML('beforeend', addCards.join(''));
+   
   gallerySet.refresh();
-
-    
-  
-  
-  // enambeBtn();
-  
+// enambeBtn();
     
 }
 
 
 
-// function clickLoadMore(e) {
+// function clickLoadMore() {
 
 //     axios.get(`${BASE_URL}?key=${KEY}&q=${refs.input.value}&${PARAMS_SEARCH}&page=${counter}`)
 //         .then(result => {
